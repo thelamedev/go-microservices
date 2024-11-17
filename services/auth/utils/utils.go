@@ -2,13 +2,10 @@ package utils
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
 func WriteError(w http.ResponseWriter, err error, statusCode int) {
-	log.Printf("[ERROR] %s", err.Error())
-
 	WriteJSON(w, map[string]any{
 		"error":      err.Error(),
 		"statusCode": statusCode,
