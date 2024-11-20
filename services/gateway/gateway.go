@@ -25,14 +25,15 @@ func NewGateway(addr string) *Gateway {
 		ServiceRegistry: NewServiceRegistry(),
 	}
 
-	mux.HandleFunc("POST /auth/login", g.ProxyServiceRequest("auth", "/login"))
-	mux.HandleFunc("POST /auth/register", g.ProxyServiceRequest("auth", "/register"))
+	mux.HandleFunc("/auth/{path}", g.ProxyServiceRequest("auth"))
 
 	return g
 }
 
-func (g *Gateway) ProxyServiceRequest(serviceName string, path string) http.HandlerFunc {
+func (g *Gateway) ProxyServiceRequest(serviceName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		path := r.PathValue("path")
+
 		reqMethod := r.Method
 		serviceItem, err := g.ServiceRegistry.GetService(serviceName)
 		if err != nil {
@@ -49,6 +50,9 @@ func (g *Gateway) ProxyServiceRequest(serviceName string, path string) http.Hand
 		newReq, err := http.NewRequest(reqMethod, reqUrl, r.Body)
 		defer r.Body.Close()
 
+		newReq.Header.Set("authorization", r.Header.Get("authorization"))
+		newReq.Header.Set("origin", r.Header.Get("origin"))
+
 		if err != nil {
 			utils.WriteError(w, err, 500)
 			return
@@ -59,6 +63,8 @@ func (g *Gateway) ProxyServiceRequest(serviceName string, path string) http.Hand
 			utils.WriteError(w, err, 500)
 			return
 		}
+
+		w.WriteHeader(response.StatusCode)
 
 		defer response.Body.Close()
 		_, err = io.Copy(w, response.Body)

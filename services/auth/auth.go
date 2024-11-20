@@ -20,7 +20,12 @@ func NewAuthService(addr string) *AuthService {
 		Mux:  mux,
 	}
 
-	mux.HandleFunc("POST /login", NoOpHandle)
+	mux.HandleFunc("POST /login", HandleUserLogin)
+	mux.HandleFunc("POST /signup", HandleUserSignup)
+	mux.HandleFunc("POST /logout", HandleUserLogout)
+
+	// will be used a lot of times
+	mux.HandleFunc("GET /verify", HandleUserVerify)
 
 	return g
 }

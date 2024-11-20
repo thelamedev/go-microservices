@@ -8,9 +8,15 @@
 
 
 ### Services
-- Auth
+- Auth 
+    - Design | done 
+    - Implementation | done
 - Math
+    - Design | pending 
+    - Implementation | pending
 - Physics
+    - Design | pending 
+    - Implementation | pending
 
 ### Request Trace
 - Request Entry - Request Exit
